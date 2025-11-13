@@ -122,6 +122,39 @@ async function run() {
     });
 
 
+    app.patch("/cars/:id", async (req, res) => {
+  const { id } = req.params;
+  const data = req.body;
+  try {
+    const result = await carCollection.updateOne(
+      { _id: new ObjectId(id) },
+      { $set: data }
+    );
+    res.send({ success: true, result });
+  } catch (error) {
+    console.error("Error updating car status:", error);
+    res.status(500).send({ success: false, message: "Failed to update car" });
+  }
+});
+
+
+// get user bookings
+app.get("/bookings", async (req, res) => {
+  const email = req.query.email;
+  const result = await bookingsCollection.find({ userEmail: email }).toArray();
+  res.send(result);
+});
+
+// delete booking
+app.delete("/bookings/:id", async (req, res) => {
+  const { id } = req.params;
+  const result = await bookingsCollection.deleteOne({ _id: new ObjectId(id) });
+  res.send(result);
+});
+
+
+
+
   } finally {
   }
 }
