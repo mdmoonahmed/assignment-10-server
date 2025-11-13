@@ -26,6 +26,7 @@ async function run() {
 
     const db = client.db("car-db");
     const carCollection = db.collection("car-data");
+    const bookingsCollection = db.collection("booking-data")
 
     // all cars
     app.get("/cars", async (req, res) => {
@@ -59,8 +60,8 @@ async function run() {
     app.put("/cars/:id", async (req, res) => {
       const { id } = req.params;
       const data = req.body;
-      console.log( 'update id:',id)
-      console.log('update data:', data)
+      console.log("update id:", id);
+      console.log("update data:", data);
       const objectId = new ObjectId(id);
       const filter = { _id: objectId };
       const update = {
@@ -107,6 +108,20 @@ async function run() {
         .toArray();
       res.send(result);
     });
+
+    // bookings
+
+    app.post("/bookings", async (req, res) => {
+      const booking = req.body;
+      const result = await bookingsCollection.insertOne(booking);
+      await carCollection.updateOne(
+        { _id: new ObjectId(booking.carId) },
+        { $set: { status: "Unavailable" } }
+      );
+      res.send(result);
+    });
+
+
   } finally {
   }
 }
